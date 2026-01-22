@@ -1,4 +1,4 @@
-/* --- General Dashboard Styles --- */
+
 body {
   font-family: Arial, sans-serif;
   background-color: #f4f6f8;
@@ -38,7 +38,6 @@ input:focus, select:focus {
   border-color: #3498db;
 }
 
-/* --- Table Styles --- */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -64,20 +63,19 @@ tr:hover {
   background-color: #f1f1f1;
 }
 
-/* --- Priority Colors --- */
+
 .priority-low { color: green; font-weight: bold; }
 .priority-medium { color: orange; font-weight: bold; }
 .priority-high { color: red; font-weight: bold; }
 .priority-critical { color: darkred; font-weight: bold; }
 
-/* --- Status Colors --- */
+
 .status-open { color: #3498db; font-weight: bold; }
 .status-inprogress { color: #f39c12; font-weight: bold; }
 .status-onhold { color: #8e44ad; font-weight: bold; }
 .status-completed { color: green; font-weight: bold; }
 .status-rejected { color: red; font-weight: bold; }
 
-/* --- Filters and Search --- */
 .filters {
   display: flex;
   gap: 10px;
@@ -90,7 +88,7 @@ tr:hover {
   min-width: 120px;
 }
 
-/* --- Comments Section --- */
+
 .comments-section {
   background-color: #fff;
   padding: 15px;

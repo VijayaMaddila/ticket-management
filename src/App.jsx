@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import Login from "../Login";
+import Register from "../Component/Register";
 import Dashboard from "../Component/DashBoard";
 import CreateTicket from "../Component/CreateTicket";
 import TicketDetails from "../Component/TicketDetails";
@@ -18,77 +19,76 @@ function App() {
     }
   }, []);
 
-  if (!user) {
-    return (
-      <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<Login setUser={setUser} />} />
-          <Route path="*" element={<Navigate to="/login" />} />
-        </Routes>
-      </BrowserRouter>
-    );
-  }
-
   return (
     <BrowserRouter>
       <Routes>
-        {/* LOGIN */}
-        <Route path="/login" element={<Login setUser={setUser} />} />
+      
+        {!user && (
+          <>
+            <Route path="/login" element={<Login setUser={setUser} />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="*" element={<Navigate to="/login" replace />} />
+          </>
+        )}
 
-        {/* DASHBOARD */}
-        <Route path="/" element={<Dashboard user={user} />} />
+      
+        {user && (
+          <>
+          
+            <Route path="/" element={<Dashboard user={user} setUser={setUser} />} />
 
-        {/* CREATE TICKET - REQUESTER ONLY */}
-        <Route
-          path="/create-ticket"
-          element={
-            user.role.toLowerCase() === "requester" ? (
-              <CreateTicket user={user} />
-            ) : (
-              <Navigate to="/" />
-            )
-          }
-        />
+          
+            <Route
+              path="/create-ticket"
+              element={
+                user.role.toLowerCase() === "requester" ? (
+                  <CreateTicket user={user} />
+                ) : (
+                  <Navigate to="/" replace />
+                )
+              }
+            />
 
-        {/* ASSIGNED TICKETS - DATAMEMBER ONLY */}
-        <Route
-          path="/assigned-tickets"
-          element={
-            user.role.toLowerCase() === "datamember" ? (
-              <AssignedTickets user={user} />
-            ) : (
-              <Navigate to="/" />
-            )
-          }
-        />
+            
+            <Route
+              path="/assigned-tickets"
+              element={
+                user.role.toLowerCase() === "datamember" ? (
+                  <AssignedTickets user={user} />
+                ) : (
+                  <Navigate to="/" replace />
+                )
+              }
+            />
 
-        {/* TICKET DETAILS - Only Admins & Requesters */}
-        <Route
-          path="/ticket/:id"
-          element={
-            user.role.toLowerCase() === "admin" ||
-            user.role.toLowerCase() === "requester" ? (
-              <TicketDetails user={user} />
-            ) : (
-              <Navigate to="/" />
-            )
-          }
-        />
+            
+            <Route
+              path="/ticket/:id"
+              element={
+                ["admin", "requester"].includes(user.role.toLowerCase()) ? (
+                  <TicketDetails user={user} />
+                ) : (
+                  <Navigate to="/" replace />
+                )
+              }
+            />
 
-        {/* ADMIN PANEL - ADMIN ONLY */}
-        <Route
-          path="/admin"
-          element={
-            user.role.toLowerCase() === "admin" ? (
-              <AdminPanel />
-            ) : (
-              <Navigate to="/" />
-            )
-          }
-        />
+          
+            <Route
+              path="/admin"
+              element={
+                user.role.toLowerCase() === "admin" ? (
+                  <AdminPanel user={user} />
+                ) : (
+                  <Navigate to="/" replace />
+                )
+              }
+            />
 
-        {/* Catch-all */}
-        <Route path="*" element={<Navigate to="/" />} />
+            
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </>
+        )}
       </Routes>
     </BrowserRouter>
   );

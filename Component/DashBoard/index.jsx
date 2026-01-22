@@ -3,13 +3,12 @@ import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const [tickets, setTickets] = useState([]);
+  const [filteredTickets, setFilteredTickets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [selectedTicket, setSelectedTicket] = useState(null);
-  const [comments, setComments] = useState([]);
-  const [newComment, setNewComment] = useState("");
 
   const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
   const [priorityFilter, setPriorityFilter] = useState("");
   const [requestTypeFilter, setRequestTypeFilter] = useState("");
   const [assignedFilter, setAssignedFilter] = useState("");
@@ -19,80 +18,87 @@ const Dashboard = () => {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const role = user?.role?.toLowerCase() || "";
 
-  // Fetch tickets
+  
   useEffect(() => {
-    if (!token) navigate("/login");
+    if (!token) {
+      navigate("/login", { replace: true });
+      return;
+    }
 
-    fetch("http://localhost:8080/api/tickets", {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => {
+    const fetchTickets = async () => {
+      try {
+        const res = await fetch("http://localhost:8080/api/tickets", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         if (!res.ok) throw new Error("Failed to fetch tickets");
-        return res.json();
-      })
-      .then((data) => {
+        const data = await res.json();
         setTickets(data);
-        setLoading(false);
-      })
-      .catch((err) => {
+        setFilteredTickets(data);
+      } catch (err) {
         setError(err.message);
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    fetchTickets();
   }, [token, navigate]);
 
-  // Fetch comments for selected ticket
-  useEffect(() => {
-    if (!selectedTicket) return;
 
-    fetch(`http://localhost:8080/api/comments/ticket/${selectedTicket.id}`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => setComments(data))
-      .catch((err) => console.error(err));
-  }, [selectedTicket, token]);
+  useEffect(() => {
+    let filtered = [...tickets];
+
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      filtered = filtered.filter(
+        (t) =>
+          t.id?.toString().includes(term) ||
+          t.title?.toLowerCase().includes(term)
+      );
+    }
+
+    if (statusFilter) {
+      filtered = filtered.filter(
+        (t) => t.status?.toLowerCase() === statusFilter.toLowerCase()
+      );
+    }
+
+    if (priorityFilter) {
+      filtered = filtered.filter(
+        (t) => t.priority?.toLowerCase() === priorityFilter.toLowerCase()
+      );
+    }
+
+    if (requestTypeFilter) {
+      filtered = filtered.filter(
+        (t) => t.request_type?.toLowerCase() === requestTypeFilter.toLowerCase()
+      );
+    }
+
+    if (assignedFilter) {
+      filtered = filtered.filter(
+        (t) =>
+          (t.assignedTo?.name || "Unassigned").toLowerCase() ===
+          assignedFilter.toLowerCase()
+      );
+    }
+
+    setFilteredTickets(filtered);
+  }, [
+    tickets,
+    searchTerm,
+    statusFilter,
+    priorityFilter,
+    requestTypeFilter,
+    assignedFilter,
+  ]);
+
 
   const handleLogout = () => {
-    localStorage.clear();
-    navigate("/login");
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    navigate("/login", { replace: true });
   };
-
-  const handleAddComment = () => {
-    if (!newComment || !selectedTicket) return;
-
-    fetch(`http://localhost:8080/api/comments/ticket/${selectedTicket.id}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ comment: newComment }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setComments((prev) => [...prev, data]);
-        setNewComment("");
-      })
-      .catch((err) => alert(err.message));
-  };
-
-  const filteredTickets = tickets.filter((t) => {
-    return (
-      (!searchTerm ||
-        t.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        t.id.toString().includes(searchTerm)) &&
-      (!priorityFilter ||
-        t.priority.toLowerCase() === priorityFilter.toLowerCase()) &&
-      (!requestTypeFilter ||
-        t.request_type.toLowerCase() === requestTypeFilter.toLowerCase()) &&
-      (!assignedFilter ||
-        (t.assignedTo?.name || "Unassigned").toLowerCase() ===
-          assignedFilter.toLowerCase())
-    );
-  });
 
   const getPriorityColor = (priority) => {
     switch (priority?.toLowerCase()) {
@@ -128,15 +134,13 @@ const Dashboard = () => {
 
   if (loading)
     return (
-      <p style={{ textAlign: "center", marginTop: "50px", color: "#555" }}>
+      <p style={{ textAlign: "center", marginTop: "50px" }}>
         Loading tickets...
       </p>
     );
   if (error)
     return (
-      <p
-        style={{ textAlign: "center", color: "red", marginTop: "50px" }}
-      >
+      <p style={{ textAlign: "center", color: "red", marginTop: "50px" }}>
         {error}
       </p>
     );
@@ -146,6 +150,7 @@ const Dashboard = () => {
   ];
   const priorities = [...new Set(tickets.map((t) => t.priority))];
   const requestTypes = [...new Set(tickets.map((t) => t.request_type))];
+  const statuses = [...new Set(tickets.map((t) => t.status))];
 
   return (
     <div
@@ -156,7 +161,7 @@ const Dashboard = () => {
         background: "linear-gradient(to right, #ece9e6, #ffffff)",
       }}
     >
-      {/* Header */}
+      
       <div
         style={{
           display: "flex",
@@ -165,30 +170,43 @@ const Dashboard = () => {
           marginBottom: "25px",
         }}
       >
-        <h2 style={{ margin: 0, color: "#2c3e50" }}>Admin Dashboard</h2>
-        <button
-          onClick={handleLogout}
-          style={{
-            padding: "8px 16px",
-            borderRadius: "8px",
-            border: "none",
-            background: "#e74c3c",
-            color: "#fff",
-            fontWeight: "bold",
-            cursor: "pointer",
-          }}
-        >
-          Logout
-        </button>
+        <h2 style={{ margin: 0, color: "#2c3e50" }}>Tickets Dashboard</h2>
+        <div style={{ display: "flex", gap: "10px" }}>
+          <button
+            onClick={handleLogout}
+            style={{
+              padding: "8px 16px",
+              borderRadius: "8px",
+              background: "#e74c3c",
+              color: "#fff",
+              fontWeight: "bold",
+            }}
+          >
+            Logout
+          </button>
+          {role === "requester" && (
+            <button onClick={() => navigate("/create-ticket")}>
+              Create Ticket
+            </button>
+          )}
+          {role === "admin" && (
+            <button onClick={() => navigate("/admin")}>Admin Panel</button>
+          )}
+          {role === "datamember" && (
+            <button onClick={() => navigate("/assigned-tickets")}>
+              My Tickets
+            </button>
+          )}
+        </div>
       </div>
 
-      {/* Filters */}
+      
       <div
         style={{
           display: "flex",
           flexWrap: "wrap",
           gap: "10px",
-          marginBottom: "30px",
+          marginBottom: "25px",
         }}
       >
         <input
@@ -198,24 +216,28 @@ const Dashboard = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
           style={{
             flex: "1 1 200px",
-            padding: "10px 15px",
+            padding: "10px",
             borderRadius: "25px",
             border: "1px solid #ccc",
             outline: "none",
-            fontSize: "14px",
-            boxShadow: "0 2px 5px rgba(0,0,0,0.05)",
           }}
         />
         <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          style={{ padding: "10px", borderRadius: "25px" }}
+        >
+          <option value="">All Status</option>
+          {statuses.map((s, i) => (
+            <option key={i} value={s}>
+              {s}
+            </option>
+          ))}
+        </select>
+        <select
           value={priorityFilter}
           onChange={(e) => setPriorityFilter(e.target.value)}
-          style={{
-            padding: "10px 15px",
-            borderRadius: "25px",
-            border: "1px solid #ccc",
-            fontSize: "14px",
-            boxShadow: "0 2px 5px rgba(0,0,0,0.05)",
-          }}
+          style={{ padding: "10px", borderRadius: "25px" }}
         >
           <option value="">All Priority</option>
           {priorities.map((p, i) => (
@@ -227,13 +249,7 @@ const Dashboard = () => {
         <select
           value={requestTypeFilter}
           onChange={(e) => setRequestTypeFilter(e.target.value)}
-          style={{
-            padding: "10px 15px",
-            borderRadius: "25px",
-            border: "1px solid #ccc",
-            fontSize: "14px",
-            boxShadow: "0 2px 5px rgba(0,0,0,0.05)",
-          }}
+          style={{ padding: "10px", borderRadius: "25px" }}
         >
           <option value="">All Request Types</option>
           {requestTypes.map((r, i) => (
@@ -245,13 +261,7 @@ const Dashboard = () => {
         <select
           value={assignedFilter}
           onChange={(e) => setAssignedFilter(e.target.value)}
-          style={{
-            padding: "10px 15px",
-            borderRadius: "25px",
-            border: "1px solid #ccc",
-            fontSize: "14px",
-            boxShadow: "0 2px 5px rgba(0,0,0,0.05)",
-          }}
+          style={{ padding: "10px", borderRadius: "25px" }}
         >
           <option value="">All Assigned Users</option>
           {assignedUsers.map((u, i) => (
@@ -262,7 +272,7 @@ const Dashboard = () => {
         </select>
       </div>
 
-      {/* Tickets Grid */}
+      
       <div
         style={{
           display: "grid",
@@ -279,15 +289,7 @@ const Dashboard = () => {
               padding: "20px",
               boxShadow: "0 5px 15px rgba(0,0,0,0.08)",
               transition: "all 0.2s ease",
-              cursor: "pointer",
             }}
-            onClick={() => setSelectedTicket(ticket)}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.transform = "translateY(-5px)")
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.transform = "translateY(0)")
-            }
           >
             <div
               style={{
@@ -346,7 +348,6 @@ const Dashboard = () => {
               >
                 {ticket.status}
               </span>
-              {/* Assigned Circle */}
               <div
                 style={{
                   width: "35px",
@@ -364,97 +365,19 @@ const Dashboard = () => {
                 {ticket.assignedTo?.name?.charAt(0).toUpperCase() || "—"}
               </div>
             </div>
+            <div style={{ marginTop: "10px", display: "flex", gap: "10px" }}>
+              {(role === "admin" || role === "requester") && (
+                <button
+                  style={{ flex: 1, padding: "6px", borderRadius: "8px" }}
+                  onClick={() => navigate(`/ticket/${ticket.id}`)}
+                >
+                  View Details
+                </button>
+              )}
+            </div>
           </div>
         ))}
       </div>
-
-      {/* Comments Modal */}
-      {selectedTicket && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: "rgba(0,0,0,0.5)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            zIndex: 1000,
-            padding: "20px",
-          }}
-        >
-          <div
-            style={{
-              width: "100%",
-              maxWidth: "500px",
-              background: "#fff",
-              borderRadius: "15px",
-              padding: "20px",
-              maxHeight: "80vh",
-              overflowY: "auto",
-            }}
-          >
-            <h3 style={{ marginTop: 0, color: "#2c3e50" }}>
-              {selectedTicket.title} - Comments
-            </h3>
-            <div style={{ marginBottom: "15px" }}>
-              {comments.length > 0
-                ? comments.map((c) => (
-                    <p key={c.id}>
-                      <strong>{c.createdBy?.name || "Unknown"}:</strong>{" "}
-                      {c.comment}
-                    </p>
-                  ))
-                : "No comments yet."}
-            </div>
-            <div style={{ display: "flex", gap: "10px" }}>
-              <input
-                type="text"
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                placeholder="Write a comment"
-                style={{
-                  flex: 1,
-                  padding: "10px",
-                  borderRadius: "25px",
-                  border: "1px solid #ccc",
-                  outline: "none",
-                }}
-              />
-              <button
-                onClick={handleAddComment}
-                style={{
-                  padding: "10px 20px",
-                  borderRadius: "25px",
-                  border: "none",
-                  background: "#2ecc71",
-                  color: "#fff",
-                  fontWeight: "bold",
-                  cursor: "pointer",
-                }}
-              >
-                Add
-              </button>
-              <button
-                onClick={() => setSelectedTicket(null)}
-                style={{
-                  padding: "10px 20px",
-                  borderRadius: "25px",
-                  border: "none",
-                  background: "#e74c3c",
-                  color: "#fff",
-                  fontWeight: "bold",
-                  cursor: "pointer",
-                }}
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

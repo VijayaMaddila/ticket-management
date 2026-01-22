@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
 const Login = ({ setUser }) => {
@@ -7,6 +7,14 @@ const Login = ({ setUser }) => {
   const [error, setError] = useState("");
 
   const navigate = useNavigate();
+
+  
+  useEffect(() => {
+    const user = localStorage.getItem("user");
+    if (user) {
+      navigate("/"); 
+    }
+  }, [navigate]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -41,25 +49,11 @@ const Login = ({ setUser }) => {
 
       setUser(userData);
 
-      // Role-based redirection
-      switch (data.role.toLowerCase()) {
-        case "admin":
-          navigate("/admin");
-          break;
-        case "requester":
-          navigate("/create-ticket");
-          break;
-        case "datamember":
-          navigate("/assigned-tickets");
-          break;
-        default:
-          navigate("/"); 
-      }
+      navigate("/"); 
     } catch (err) {
       setError(err.message);
     }
   };
-
 
   return (
     <div
@@ -92,7 +86,7 @@ const Login = ({ setUser }) => {
             color: "#333",
           }}
         >
-          Welcome Back
+          Welcome Back Ticket Management
         </h2>
 
         <form

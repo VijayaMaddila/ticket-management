@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "./index.css";
 
 const CreateTicket = ({ user }) => {
-  const navigate = useNavigate(); // 👈 useNavigate here
+  const navigate = useNavigate();
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -41,97 +42,95 @@ const CreateTicket = ({ user }) => {
         throw new Error(text || "Failed to create ticket");
       }
 
-      setSuccess("Ticket created successfully!");
+      setSuccess("🎉 Ticket created successfully!");
 
-      // reset form
       setTitle("");
       setDescription("");
       setRequestType("ACCESS");
       setPriority("LOW");
       setRequestedDataset("");
 
-      // ✅ Redirect after success (delay optional)
-      setTimeout(() => {
-        navigate("/"); // dashboard
-      }, 1000);
-
+      setTimeout(() => navigate("/"), 1500);
     } catch (err) {
       setError(err.message);
     }
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Create Ticket</h2>
+    <div className="create-ticket-wrapper">
+      <div className="create-ticket-card">
+        <h2>Create New Ticket</h2>
+        <p className="subtitle">Submit a request to the data team</p>
 
-      {success && <p style={{ color: "green" }}>{success}</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
+        {success && <div className="alert success">{success}</div>}
+        {error && <div className="alert error">{error}</div>}
 
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Title</label><br />
-          <input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-          />
-        </div>
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label>Title</label>
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Short summary of the request"
+              required
+            />
+          </div>
 
-        <div>
-          <label>Description</label><br />
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            required
-          />
-        </div>
+          <div className="form-group">
+            <label>Description</label>
+            <textarea
+              rows="4"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Explain your request in detail"
+              required
+            />
+          </div>
 
-        <div>
-          <label>Request Type</label><br />
-          <select
-            value={requestType}
-            onChange={(e) => setRequestType(e.target.value)}
-          >
-            <option value="ACCESS">ACCESS</option>
-            <option value="REPORT">REPORT</option>
-            <option value="BUG">BUG</option>
-            <option value="PIPELINE">PIPELINE</option>
-            <option value="OTHER">OTHER</option>
-          </select>
-        </div>
+          <div className="grid-2">
+            <div className="form-group">
+              <label>Request Type</label>
+              <select value={requestType} onChange={(e) => setRequestType(e.target.value)}>
+                <option value="ACCESS">Access</option>
+                <option value="REPORT">Report</option>
+                <option value="BUG">Bug</option>
+                <option value="PIPELINE">Pipeline</option>
+                <option value="OTHER">Other</option>
+              </select>
+            </div>
 
-        <div>
-          <label>Priority</label><br />
-          <select
-            value={priority}
-            onChange={(e) => setPriority(e.target.value)}
-          >
-            <option value="LOW">LOW</option>
-            <option value="MEDIUM">MEDIUM</option>
-            <option value="HIGH">HIGH</option>
-            <option value="CRITICAL">CRITICAL</option>
-          </select>
-        </div>
+            <div className="form-group">
+              <label>Priority</label>
+              <select value={priority} onChange={(e) => setPriority(e.target.value)}>
+                <option value="LOW">Low</option>
+                <option value="MEDIUM">Medium</option>
+                <option value="HIGH">High</option>
+                <option value="CRITICAL">Critical</option>
+              </select>
+            </div>
+          </div>
 
-        <div>
-          <label>Requested Dataset</label><br />
-          <input
-            value={requestedDataset}
-            onChange={(e) => setRequestedDataset(e.target.value)}
-          />
-        </div>
+          <div className="form-group">
+            <label>Requested Dataset (optional)</label>
+            <input
+              type="text"
+              value={requestedDataset}
+              onChange={(e) => setRequestedDataset(e.target.value)}
+              placeholder="Dataset name or ID"
+            />
+          </div>
 
-        <div style={{ marginTop: "10px" }}>
-          <button type="submit">Create Ticket</button>
-          <button
-            type="button"
-            onClick={() => navigate("/")}
-            style={{ marginLeft: "10px" }}
-          >
-            Cancel
-          </button>
-        </div>
-      </form>
+          <div className="actions">
+            <button type="submit" className="btn primary">
+              Create Ticket
+            </button>
+            <button type="button" className="btn secondary" onClick={() => navigate("/")}>
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };

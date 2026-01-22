@@ -1,11 +1,12 @@
 import { useState } from "react";
-import "./index.css"
+import { Link } from "react-router-dom";
+import "./index.css";
 
 function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState(""); 
+  const [role, setRole] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -15,78 +16,110 @@ function Register() {
     setSuccess("");
 
     const userDetails = { name, email, password, role };
-    const url = "http://localhost:8080/api/users";
-
-    const options = {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(userDetails),
-    };
 
     try {
-      const response = await fetch(url, options);
+      const response = await fetch("http://localhost:8080/api/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(userDetails),
+      });
+
       const data = await response.json();
 
       if (response.ok) {
-        setSuccess("Registration successful!");
+        setSuccess("Registration successful! Please login.");
         setName("");
         setEmail("");
         setPassword("");
-        setRole("USER");
+        setRole("");
       } else {
         setError(data.message || "Registration failed");
       }
-    } catch (err) {
+    } catch {
       setError("Network error");
     }
   };
 
   return (
-    <div className="register-container">
-      <form className="register-form" onSubmit={handleSubmit}>
-        <h2>Register</h2>
+    <div className="register-page">
+      <div className="register-card">
+        <h2>Create Account</h2>
+        <p className="subtitle">Join the Ticket Management System</p>
+
         {error && <p className="error">{error}</p>}
         {success && <p className="success">{success}</p>}
 
-        <label htmlFor="name">Name:</label>
-        <input
-          type="text"
-          id="name"
-          placeholder="Full Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label>Name</label>
+            <input
+              type="text"
+              placeholder="Full name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+          </div>
 
-        <label htmlFor="email">Email:</label>
-        <input
-          type="email"
-          id="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
+          <div className="form-group">
+            <label>Email</label>
+            <input
+              type="email"
+              placeholder="Email address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
 
-        <label htmlFor="password">Password:</label>
-        <input
-          type="password"
-          id="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
+          <div className="form-group">
+            <label>Password</label>
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
 
-        <label htmlFor="role">Role:</label>
-        <select id="role" value={role} onChange={(e) => setRole(e.target.value)}>
-          <option value="REQUESTER">Requester</option>
-          <option value="DATAMEMBER">Satamember</option>
-          <option value="ADMIN">Admin</option>
-        </select>
+          <div className="form-group">
+            <label>Role</label>
+            <select value={role} onChange={(e) => setRole(e.target.value)} required>
+              <option value="">Select role</option>
+              <option value="requester">Requester</option>
+              <option value="datamember">Data Member</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
 
-        <button type="submit">Register</button>
-      </form>
+          <button type="submit" className="register-btn">
+            Register
+          </button>
+        </form>
+
+        
+        <p
+          style={{
+            textAlign: "center",
+            marginTop: "18px",
+            fontSize: "14px",
+            color: "#9ca3af",
+          }}
+        >
+          Already have an account?{" "}
+          <Link
+            to="/login"
+            style={{
+              color: "#3b82f6",
+              fontWeight: "bold",
+              textDecoration: "none",
+            }}
+          >
+            Login
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }

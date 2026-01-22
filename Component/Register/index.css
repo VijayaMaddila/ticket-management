@@ -1,90 +1,114 @@
-/* ------------------ Register Container ------------------ */
-.register-container {
+
+.register-page {
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
-  background: #1f2937; /* Dark background */
+  background: linear-gradient(135deg, #6c63ff, #3f3d56);
   padding: 20px;
 }
 
-/* ------------------ Register Form ------------------ */
-.register-form {
-  background: #111827;
-  padding: 30px 25px;
-  border-radius: 10px;
+.register-card {
   width: 100%;
-  max-width: 400px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-  color: #f9fafb;
+  max-width: 420px;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 40px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  color: #333;
+}
+
+.register-card h2 {
+  text-align: center;
+  font-size: 28px;
+  margin-bottom: 6px;
+  color: #333;
+}
+
+.subtitle {
+  text-align: center;
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 25px;
+}
+
+.error {
+  color: #e11d48;
+  text-align: center;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.success {
+  color: #16a34a;
+  text-align: center;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+
+form {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 20px;
 }
 
-.register-form h2 {
-  text-align: center;
-  margin-bottom: 10px;
-  font-size: 1.5rem;
-  color: #2563eb;
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
-.register-form label {
-  font-size: 0.875rem;
-  margin-bottom: 4px;
-  color: #9ca3af;
+.form-group label {
+  font-size: 14px;
+  color: #555;
 }
 
-.register-form input,
-.register-form select {
-  width: 100%;
-  padding: 8px 10px;
-  border-radius: 6px;
-  border: 1px solid #374151;
-  background-color: #1f2937;
-  color: #f9fafb;
-  font-size: 0.875rem;
+.form-group input,
+.form-group select {
+  padding: 14px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  transition: 0.3s ease;
 }
 
-.register-form input:focus,
-.register-form select:focus {
+.form-group input:focus,
+.form-group select:focus {
   outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+  border-color: #6c63ff;
+  box-shadow: 0 0 0 2px rgba(108, 99, 255, 0.25);
 }
-
-.register-form button {
-  margin-top: 10px;
-  padding: 10px;
-  border: none;
-  border-radius: 6px;
-  background-color: #2563eb;
-  color: white;
+.register-btn {
+  padding: 14px;
+  border-radius: 8px;
+  background: #6c63ff;
+  color: #ffffff;
+  font-size: 16px;
   font-weight: bold;
+  border: none;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: 0.3s ease;
 }
 
-.register-form button:hover {
-  background-color: #1d4ed8;
+.register-btn:hover {
+  background: #5952d4;
 }
 
-/* ------------------ Messages ------------------ */
-.register-form .error {
-  color: #f87171;
-  font-size: 0.875rem;
-  text-align: center;
+
+.register-card a {
+  color: #6c63ff;
+  font-weight: bold;
+  text-decoration: none;
 }
 
-.register-form .success {
-  color: #4ade80;
-  font-size: 0.875rem;
-  text-align: center;
+.register-card a:hover {
+  text-decoration: underline;
 }
 
-/* ------------------ Responsive ------------------ */
+
 @media (max-width: 480px) {
-  .register-form {
-    padding: 25px 20px;
+  .register-card {
+    padding: 30px 22px;
   }
 }
