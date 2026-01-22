@@ -1,0 +1,145 @@
+/* --- General Styles --- */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f6f8;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+h2, h3 {
+  color: #2c3e50;
+  margin-bottom: 15px;
+}
+
+button {
+  padding: 6px 12px;
+  background-color: #3498db;
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+button:hover {
+  background-color: #2980b9;
+}
+
+button:disabled {
+  background-color: #95a5a6;
+  cursor: not-allowed;
+}
+
+select {
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+select:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+/* --- Table Styles --- */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+}
+
+thead {
+  background-color: #3498db;
+  color: #fff;
+}
+
+th, td {
+  text-align: left;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* --- Messages --- */
+p {
+  font-size: 14px;
+}
+
+p[style*="red"] {
+  color: #e74c3c;
+}
+
+p[style*="green"] {
+  color: #27ae60;
+}
+
+/* --- Assign Ticket Section --- */
+select {
+  margin-right: 10px;
+  min-width: 150px;
+}
+
+div {
+  margin-bottom: 15px;
+}
+
+/* --- Responsive Styles --- */
+
+/* Tablets */
+@media (max-width: 992px) {
+  th, td {
+    padding: 8px;
+    font-size: 13px;
+  }
+
+  select, button {
+    font-size: 13px;
+    padding: 5px 8px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  table, thead, tbody, th, td, tr {
+    display: block;
+    width: 100%;
+  }
+
+  thead tr {
+    display: none;
+  }
+
+  tr {
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    background-color: #fff;
+  }
+
+  td {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    border-bottom: none;
+  }
+
+  td::before {
+    content: attr(data-label);
+    font-weight: bold;
+  }
+
+  select, button {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+}

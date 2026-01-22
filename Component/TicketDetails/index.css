@@ -1,0 +1,97 @@
+.ticket-details-container {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-family: Arial, sans-serif;
+}
+
+.ticket-details-container h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.ticket-details-container button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+.ticket-details-container button:hover {
+  background-color: #0056b3;
+}
+
+.ticket-info p {
+  margin: 8px 0;
+  font-size: 14px;
+}
+
+/* Priority Colors */
+.priority.low { color: green; font-weight: bold; }
+.priority.medium { color: blue; font-weight: bold; }
+.priority.high { color: orange; font-weight: bold; }
+.priority.critical { color: red; font-weight: bold; }
+
+/* Status Colors */
+.status.open { color: gray; font-weight: bold; }
+.status.in_progress { color: blue; font-weight: bold; }
+.status.on_hold { color: orange; font-weight: bold; }
+.status.completed { color: green; font-weight: bold; }
+.status.rejected { color: red; font-weight: bold; }
+
+/* Comments Section */
+.comments-section {
+  margin-top: 30px;
+  padding-top: 15px;
+  border-top: 1px solid #ccc;
+}
+
+.add-comment {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+.add-comment input {
+  flex: 1;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.add-comment button {
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: none;
+  background-color: #28a745;
+  color: white;
+  cursor: pointer;
+}
+
+.add-comment button:hover {
+  background-color: #218838;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .ticket-details-container {
+    padding: 15px;
+  }
+
+  .ticket-info p, .comments-section p {
+    font-size: 13px;
+  }
+
+  .ticket-details-container button,
+  .add-comment button {
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+}
