@@ -1,0 +1,21 @@
+/* Comments modal content - matches existing .comments-content layout */
+.comments-modal-box .ui-modal {
+  width: min(640px, 96%);
+  max-height: 84%;
+}
+.comments-content-inner {
+  padding: 8px 4px;
+}
+.comments-ul {
+  list-style: none;
+  padding: 8px 4px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+.comment-li {
+  display: block;
+}

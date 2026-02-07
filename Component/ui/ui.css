@@ -1,0 +1,80 @@
+/* Reusable UI components */
+
+/* Badge - matches existing .badge.status / .badge.priority usage */
+.ui-badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  color: #fff;
+  text-transform: capitalize;
+}
+.ui-badge--status.open { background-color: #3498db; }
+.ui-badge--status.inprogress { background-color: #f1c40f; }
+.ui-badge--status.onhold { background-color: #95a5a6; }
+.ui-badge--status.completed { background-color: #2ecc71; }
+.ui-badge--status.rejected { background-color: #e74c3c; }
+.ui-badge--status.closed { background-color: #2ecc71; }
+.ui-badge--priority.low { background-color: #2ecc71; }
+.ui-badge--priority.medium { background-color: #f39c12; }
+.ui-badge--priority.high { background-color: #e74c3c; }
+.ui-badge--priority.urgent { background-color: #c0392b; }
+.ui-badge--role.requester,
+.ui-badge--role.datamember,
+.ui-badge--role.admin { background-color: #3498db; }
+
+/* Modal */
+.ui-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  z-index: 1000;
+}
+.ui-modal {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.25);
+  width: min(560px, 96%);
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.ui-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e5e7eb;
+}
+.ui-modal-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+.ui-modal-close {
+  position: static;
+  border: none;
+  background: none;
+  font-size: 1.3rem;
+  cursor: pointer;
+  color: #333;
+  padding: 4px;
+  line-height: 1;
+}
+.ui-modal-body {
+  padding: 20px;
+  overflow-y: auto;
+}
+
+/* Page states */
+.ui-page-state {
+  text-align: center;
+  font-size: 1rem;
+  margin-top: 30px;
+}
+.ui-page-state--loading { color: #666; }
+.ui-page-state--error { color: var(--danger, #ef4444); }
+.ui-page-state--empty { color: #666; }
