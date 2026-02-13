@@ -2,9 +2,13 @@ import React, { useState, useRef, useEffect } from "react";
 import "./index.css";
 
 const ChatBot = () => {
+  // hide chatbot on login page(s)
+  const isLoginPage = typeof window !== "undefined" && /(^\/login\b|\/login$|\/auth\/login)/i.test(window.location.pathname);
+  if (isLoginPage) return null;
+
   const [open, setOpen] = useState(false);
   const [minimized, setMinimized] = useState(false);
-  const [userId, setUserId] = useState(3);
+  const [userId, setUserId] = useState(null);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -19,44 +23,123 @@ const ChatBot = () => {
   }, [messages, open]);
 
   useEffect(() => {
-    const u = localStorage.getItem("user");
-    if (!u) return;
-    try {
-      const parsed = JSON.parse(u);
-      if (parsed && parsed.id) setUserId(parsed.id);
-    } catch (e) {
-      // ignore parse errors
-    }
+    const readUser = () => {
+      try {
+        const u = localStorage.getItem("user");
+        if (!u) {
+          setUserId(null);
+          return;
+        }
+        const parsed = JSON.parse(u);
+        setUserId(parsed && parsed.id ? parsed.id : null);
+      } catch {
+        setUserId(null);
+      }
+    };
+
+    readUser();
+    const onStorage = (e) => {
+      if (e.key === "user") readUser();
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
   }, []);
 
-  // load persisted conversation when userId changes
+  // when userId changes, always start a fresh chat and show welcome
   useEffect(() => {
-    const key = STORAGE_KEY_PREFIX + userId;
-    try {
-      const raw = sessionStorage.getItem(key);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed)) setMessages(parsed);
-      }
-    } catch (e) {
-      // ignore
+    if (!userId) {
+      setMessages([]);
+      return;
     }
+
+    let userName = null;
+    try {
+      const u = localStorage.getItem("user");
+      if (u) {
+        const parsedUser = JSON.parse(u);
+        userName = parsedUser && parsedUser.name ? parsedUser.name.split(" ")[0] : null;
+      }
+    } catch {
+      userName = null;
+    }
+    const welcomeMsg = {
+      from: "bot",
+      text: `Hi ${userName || "there"} — welcome to Segmento Resolve. How can I help you today?`,
+      time: new Date().toISOString(),
+    };
+    setMessages([welcomeMsg]);
   }, [userId]);
 
   const sendMessage = async (text) => {
     if (!text) return;
-    const userMsg = { from: "user", text, time: new Date().toISOString() };
-    setMessages((m) => [...m, userMsg]);
+    const trimmed = text.trim();
+
+    // If user entered a quick-reply key (e.g. "1", "1)", "1.", or "A"), map it to the reply label for display
+    // but send the key (payload) to the backend so server-side conversation state works.
+    let displayText = trimmed;
+    let payload = trimmed;
+    try {
+      // normalize the input (allow "1)", "1.", "1 -", etc.)
+      const normalizedKey = trimmed.replace(/^[\s\(]+|[\s\)\.\-\:]+$/g, "").toLowerCase();
+
+      const latestBotMsg = [...messages].slice().reverse().find((m) => m.from === "bot");
+      const possibleReplies = extractQuickReplies(latestBotMsg ? latestBotMsg.text : "");
+      if (possibleReplies && possibleReplies.length > 0) {
+        const match = possibleReplies.find((q) => String(q.key).toLowerCase() === normalizedKey);
+        if (match) {
+          displayText = `${match.key} — ${match.label}`; // show key and label to user
+          payload = String(match.key); // send the canonical key ("1", "2", etc.) to backend
+        }
+      }
+    } catch {
+      // ignore mapping errors and use raw text
+      displayText = trimmed;
+      payload = trimmed;
+    }
+    // ensure we use latest logged-in user id
+    let currentUserId = userId;
+    try {
+      const u = localStorage.getItem("user");
+      if (u) {
+        const parsed = JSON.parse(u);
+        if (parsed && parsed.id) currentUserId = parsed.id;
+      }
+    } catch {
+      // ignore
+    }
+
+    if (!currentUserId) {
+      setMessages((m) => [
+        ...m,
+        { from: "bot", text: "Please log in to use the chat.", time: new Date().toISOString() },
+      ]);
+      return;
+    }
+
+    const userMsg = { from: "user", text: displayText, time: new Date().toISOString() };
+    const currentMessages = [...messages, userMsg];
+    setMessages(currentMessages);
     setInput("");
     setLoading(true);
+
     try {
-      const res = await fetch(`http://localhost:8080/api/chat?userId=${userId}`, {
+      const res = await fetch(`http://localhost:8080/api/chat?userId=${currentUserId}`, {
         method: "POST",
         headers: { "Content-Type": "text/plain" },
-        body: text,
+        body: payload,
       });
+
       if (!res.ok) throw new Error("Network response was not ok");
-      const data = await res.text();
+
+      const ct = res.headers.get("content-type") || "";
+      let data;
+      if (ct.includes("application/json")) {
+        const json = await res.json();
+        data = json.text ?? json.reply ?? JSON.stringify(json);
+      } else {
+        data = await res.text();
+      }
+
       const botMsg = { from: "bot", text: data, time: new Date().toISOString() };
       setMessages((m) => [...m, botMsg]);
     } catch (err) {
@@ -86,19 +169,12 @@ const ChatBot = () => {
     ta.style.height = newHeight + "px";
   };
 
-  // persist conversation whenever messages change
+  // scroll into view on new message (do not persist across reloads)
   useEffect(() => {
-    const key = STORAGE_KEY_PREFIX + userId;
-    try {
-      sessionStorage.setItem(key, JSON.stringify(messages));
-    } catch (e) {
-      // ignore
-    }
-    // scroll into view on new message
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages, userId]);
+  }, [messages, open]);
 
   const formatTime = (iso) => {
     try {
