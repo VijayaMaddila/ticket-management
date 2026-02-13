@@ -10,6 +10,7 @@ import Requester from "../Component/Requester";
 import ManageDataMember from "../Component/ManageDataMember";
 import RequesterDashboard from "../Component/RequesterDashBoard";
 import Navbar from "../Component/Navbar";
+import ChatBot from "../Component/ChatBot";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -41,6 +42,7 @@ function App() {
     <BrowserRouter>
       <div className="app-with-navbar">
         <Navbar role={user?.role || ""} setUser={setUser} />
+        <ChatBot />
         <div className="app-body">
           <Routes>
           
