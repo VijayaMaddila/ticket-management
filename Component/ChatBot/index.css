@@ -314,9 +314,7 @@
   }
 
   .chat-title::before { width: 30px; height: 30px; border-radius: 6px; }
-  .bot-avatar { width: 32px; height: 32px; flex: 0 0 32px; border-radius: 8px; }
-
-  .chat-messages { padding: 12px; font-size: 14px; }
+  .bot-avatar { width: 32px; height: 32px; flex: 0 0 32px; border-radius: 8px; }  .chat-messages { padding: 12px; font-size: 14px; }
   .message { margin-bottom: 10px; padding: 8px 12px; border-radius: 10px; max-width: 86%; }
 
   .message.user::after, .message.bot::after { bottom: -5px; width: 10px; height: 10px; }
