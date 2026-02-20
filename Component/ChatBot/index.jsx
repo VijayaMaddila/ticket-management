@@ -127,11 +127,11 @@ const ChatBot = () => {
     setLoading(true);
 
     try {
-      const res = await fetch(`http://localhost:8080/api/chat?userId=${currentUserId}`, {
-        method: "POST",
-        headers: { "Content-Type": "text/plain" },
-        body: payload,
-      });
+      const res = await fetch(`${BASE_URL}/api/chat?userId=${currentUserId}`, {
+  method: "POST",
+  headers: { "Content-Type": "text/plain" },
+  body: payload,
+});
 
       if (!res.ok) throw new Error("Network response was not ok");
 
