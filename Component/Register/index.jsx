@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { API_BASE_URL } from "../../src/config/api";
 import "./index.css";
@@ -8,24 +8,9 @@ const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("");
-  const [teamId, setTeamId] = useState(""); // <-- new state for selected team
-  const [teams, setTeams] = useState([]);   // <-- list of teams
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-
-  // Fetch teams if role = datamember
-  useEffect(() => {
-    if (role === "datamember") {
-      fetch(`${API_BASE_URL}/api/teams`)
-        .then((res) => res.json())
-        .then((data) => setTeams(data))
-        .catch((err) => console.error(err));
-    } else {
-      setTeams([]);
-      setTeamId("");
-    }
-  }, [role]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -36,7 +21,7 @@ const Register = () => {
       const response = await fetch(`${API_BASE_URL}/api/users/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password, role, teamId }),
+        body: JSON.stringify({ name, email, password, role }),
       });
 
       const data = await response.json();
@@ -49,7 +34,6 @@ const Register = () => {
       setEmail("");
       setPassword("");
       setRole("");
-      setTeamId("");
     } catch (err) {
       setError(err.message || "Network error");
     }
@@ -107,22 +91,6 @@ const Register = () => {
             <option value="datamember">Data Member</option>
             <option value="admin">Admin</option>
           </select>
-
-          {/* Team dropdown shows only for Data Members */}
-          {role === "datamember" && (
-            <select
-              value={teamId}
-              onChange={(e) => setTeamId(e.target.value)}
-              required
-            >
-              <option value="">Select Team</option>
-              {teams.map((team) => (
-                <option key={team.id} value={team.id}>
-                  {team.name}
-                </option>
-              ))}
-            </select>
-          )}
 
           <button type="submit" className="register-btn">
             Register
