@@ -72,3 +72,46 @@
   .row { gap: 10px; }
 }
 
+/* Improve filter bar layout on small devices: search full-width, two filters per row */
+@media (max-width: 768px) {
+  .filters {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    align-items: center;
+  }
+
+  /* Search should take the full row */
+  .filters .search-wrapper {
+    grid-column: 1 / -1;
+    width: 100% !important;
+    min-width: 0;
+    margin-top: 0;
+    position: relative;
+  }
+
+  .search-input {
+    width: 100% !important;
+    min-width: 0;
+    padding: 12px 40px 12px 38px;
+  }
+
+  /* selects occupy two-column grid cells (two per row) */
+  .filters > select {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* clear button inside search wrapper */
+  .clear-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    padding: 6px;
+  }
+}
+
