@@ -1,0 +1,74 @@
+/* Global responsive utilities and container */
+/* Use CSS variables from index.css for consistent spacing/colors */
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--gutter);
+  padding-right: var(--gutter);
+  box-sizing: border-box;
+}
+
+.row {
+  display: flex;
+  gap: calc(var(--gutter) / 2);
+  flex-wrap: wrap;
+  align-items: stretch;
+  box-sizing: border-box;
+}
+
+.col {
+  flex: 1 1 0%;
+  min-width: 220px;
+  box-sizing: border-box;
+}
+
+.col-auto {
+  flex: 0 0 auto;
+}
+
+.responsive-img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.text-center { text-align: center; }
+.hide-mobile { display: block; }
+.show-mobile { display: none; }
+
+/* Utility spacing */
+.gap-sm { gap: 8px; }
+.gap-md { gap: 16px; }
+.gap-lg { gap: 24px; }
+
+/* Breakpoints */
+@media (max-width: 1200px) {
+  .container { max-width: 1000px; }
+}
+
+@media (max-width: 1024px) {
+  .container { max-width: 920px; }
+  .col { min-width: 200px; }
+}
+
+@media (max-width: 768px) {
+  .container { padding-left: 12px; padding-right: 12px; }
+  .col { min-width: 100%; flex-basis: 100%; }
+  .hide-mobile { display: none; }
+  .show-mobile { display: block; }
+}
+
+@media (max-width: 480px) {
+  .container { padding-left: 10px; padding-right: 10px; }
+  .row { gap: 10px; }
+}
+

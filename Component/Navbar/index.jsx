@@ -138,21 +138,21 @@ const Navbar = ({ role = "", setUser }) => {
                   <span className="label">{item.label}</span>
                 </li>
               ))}
-               {isLoggedIn && userData && (
-          <div className="user-profile" onClick={() => setProfileOpen(!profileOpen)}>
-            <div className="avatar">
-              <img
-                src={preview || "https://via.placeholder.com/36"}
-                alt="avatar"
-                style={{ width: "100%", height: "100%", borderRadius: "50%" }}
-              />
+          {isLoggedIn && userData && (
+            <div className="user-profile in-menu" onClick={() => setProfileOpen(!profileOpen)}>
+              <div className="avatar">
+                <img
+                  src={preview || "https://via.placeholder.com/36"}
+                  alt="avatar"
+                  style={{ width: "100%", height: "100%", borderRadius: "50%" }}
+                />
+              </div>
+              <div className="user-info">
+                <span className="user-name">{userData.name}</span>
+                <span className="user-role">{userData.role}</span>
+              </div>
             </div>
-            <div className="user-info">
-              <span className="user-name">{userData.name}</span>
-              <span className="user-role">{userData.role}</span>
-            </div>
-          </div>
-        )}
+          )}
 
           {isLoggedIn ? (
             <li className="mobile-item logout" onClick={logout}>
@@ -168,7 +168,23 @@ const Navbar = ({ role = "", setUser }) => {
 
        
         </ul>
-        </nav>
+        {/* show profile in navbar (visible on small devices) */}
+        {isLoggedIn && userData && (
+          <div className="user-profile navbar-inline" onClick={() => setProfileOpen(!profileOpen)}>
+            <div className="avatar">
+              <img
+                src={preview || "https://via.placeholder.com/36"}
+                alt="avatar"
+                style={{ width: "100%", height: "100%", borderRadius: "50%" }}
+              />
+            </div>
+            <div className="user-info">
+              <span className="user-name">{userData.name}</span>
+              <span className="user-role">{userData.role}</span>
+            </div>
+          </div>
+        )}
+      </nav>
 
       {/* Profile Dropdown */}
       {profileOpen && (

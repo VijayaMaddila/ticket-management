@@ -287,4 +287,22 @@
     display: flex;
     flex-direction: column;
   }
+  /* show only avatar in navbar on small devices */
+  .user-profile.navbar-inline {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 8px;
+    cursor: pointer;
+  }
+  /* hide the detailed user-info in navbar for small screens */
+  .user-profile.navbar-inline .user-info { display: none; }
+  /* Ensure menu-embedded profile isn't visible when menu is closed */
+  .user-profile.in-menu { display: none; }
+}
+
+@media (min-width: 769px) {
+  /* hide the inline navbar profile on larger screens (use in-menu inside menu) */
+  .user-profile.navbar-inline { display: none; }
+  .user-profile.in-menu { display: flex; }
 }
