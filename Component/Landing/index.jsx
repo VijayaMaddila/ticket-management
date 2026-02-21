@@ -1,6 +1,8 @@
+
 import { useNavigate } from "react-router-dom";
-import { FiShield, FiClock, FiZap, FiUsers, FiBarChart2 } from "react-icons/fi";
+import { FiShield, FiClock, FiZap, FiUsers, FiBarChart2, FiMail } from "react-icons/fi";
 import "./index.css";
+
 
 const Feature = ({ icon, title, desc }) => (
   <div className="landing-feature">
@@ -15,6 +17,7 @@ export default function Landing() {
 
   return (
     <div className="landing-page fresh">
+      {/* Hero Section */}
       <header className="fresh-hero">
         <div className="container hero-grid">
           <div className="hero-copy">
@@ -49,7 +52,7 @@ export default function Landing() {
                 <span>Active tickets</span>
               </div>
               <div className="stat">
-                <strong>100%</strong>
+                <strong>99.9%</strong>
                 <span>Uptime</span>
               </div>
             </div>
@@ -57,7 +60,6 @@ export default function Landing() {
 
           <div className="hero-media">
             <div className="card">
-              {/* Inline SVG illustration (data network style) */}
               <svg viewBox="0 0 800 520" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Data network illustration">
                 <defs>
                   <linearGradient id="g1" x1="0" x2="1" y1="0" y2="1">
@@ -70,7 +72,6 @@ export default function Landing() {
                   </linearGradient>
                 </defs>
                 <rect width="100%" height="100%" rx="12" fill="url(#g1)" />
-                {/* grid of connected nodes */}
                 <g stroke="rgba(11,116,255,0.12)" strokeWidth="2" fill="none">
                   <line x1="80" y1="120" x2="240" y2="60" />
                   <line x1="240" y1="60" x2="400" y2="120" />
@@ -79,7 +80,6 @@ export default function Landing() {
                   <line x1="300" y1="260" x2="520" y2="220" />
                   <line x1="520" y1="220" x2="680" y2="280" />
                 </g>
-                {/* nodes */}
                 <g>
                   <circle cx="80" cy="120" r="8" fill="url(#g2)" />
                   <circle cx="240" cy="60" r="10" fill="#0b74ff" opacity="0.95" />
@@ -90,7 +90,6 @@ export default function Landing() {
                   <circle cx="520" cy="220" r="8" fill="#6dd3ff" />
                   <circle cx="680" cy="280" r="6" fill="#0b74ff" />
                 </g>
-                {/* floating panels */}
                 <g>
                   <rect x="460" y="30" width="200" height="56" rx="8" fill="#071132" opacity="0.9" />
                   <text x="480" y="66" fill="#fff" fontSize="12" fontFamily="sans-serif">Requests • 1,248</text>
@@ -104,86 +103,74 @@ export default function Landing() {
         </div>
       </header>
 
+      {/* Features Section */}
       <section className="features container">
         <div className="features-header">
           <h2 className="section-title">Features</h2>
           <p className="section-desc">Key capabilities to automate requests, manage workflows and deliver results faster.</p>
         </div>
-       <div className="features-grid">
-  <Feature
-  icon={<FiZap />}
-  title="Centralized Request Intake"
-  desc="Capture all data requests, issues, and tasks in one unified system with structured forms."
-/>
-<Feature
-  icon={<FiUsers />}
-  title="Intelligent Routing"
-  desc="Automatically route requests to the right teams based on rules, categories, or workload."
-/>
-<Feature
-  icon={<FiClock />}
-  title="Workflow & SLA Automation"
-  desc="Define workflows, set SLAs, trigger reminders, and prevent delays with smart automation."
-/>
-<Feature
-  icon={<FiBarChart2 />}
-  title="Operational Visibility"
-  desc="Real-time dashboards provide insights into request volume, turnaround time, and team performance."
-/>
-<Feature
-  icon={<FiShield />}
-  title="Compliance & Audit Trails"
-  desc="Maintain complete request history with secure access controls and audit logs."
-/>
-<Feature
-  icon={<FiMail />}
-  title="Email & Slack Notifications"
-  desc="Automatically create tickets from emails, and get notifications on ticket creation and status updates via email and Slack for real-time tracking."
-/>
-</div>
-
+        <div className="features-grid">
+          <Feature
+            icon={<FiZap />}
+            title="Centralized Request Intake"
+            desc="Capture all data requests, issues, and tasks in one unified system with structured forms."
+          />
+          <Feature
+            icon={<FiUsers />}
+            title="Intelligent Routing"
+            desc="Automatically route requests to the right teams based on rules, categories, or workload."
+          />
+          <Feature
+            icon={<FiClock />}
+            title="Workflow & SLA Automation"
+            desc="Define workflows, set SLAs, trigger reminders, and prevent delays with smart automation."
+          />
+          <Feature
+            icon={<FiBarChart2 />}
+            title="Operational Visibility"
+            desc="Real-time dashboards provide insights into request volume, turnaround time, and team performance."
+          />
+          <Feature
+            icon={<FiShield />}
+            title="Compliance & Audit Trails"
+            desc="Maintain complete request history with secure access controls and audit logs."
+          />
+          <Feature
+            icon={<FiMail />}
+            title="Email & Slack Notifications"
+            desc="Automatically create tickets from emails, and get notifications on ticket creation and status updates via email and Slack for real-time tracking."
+          />
+        </div>
       </section>
 
-     <section className="how container">
-  <h2>How It Works</h2>
-  <div className="steps">
+      {/* How It Works Section */}
+      <section className="how container">
+        <h2>How It Works</h2>
+        <div className="steps">
+          <div className="step">
+            <div className="num">1</div>
+            <h4>Submit a Request</h4>
+            <p>Users submit data requests, issues, or tasks through structured forms, email, or API.</p>
+          </div>
+          <div className="step">
+            <div className="num">2</div>
+            <h4>Auto-Route & Prioritize</h4>
+            <p>The system automatically assigns the request to the right team, sets priority, and applies SLA rules.</p>
+          </div>
+          <div className="step">
+            <div className="num">3</div>
+            <h4>Track & Collaborate</h4>
+            <p>Teams collaborate, update status, add comments, and track progress in real time.</p>
+          </div>
+          <div className="step">
+            <div className="num">4</div>
+            <h4>Deliver & Audit</h4>
+            <p>Once resolved, stakeholders are notified and a complete audit trail is maintained for compliance.</p>
+          </div>
+        </div>
+      </section>
 
-    <div className="step">
-      <div className="num">1</div>
-      <h4>Submit a Request</h4>
-      <p>
-        Users submit data requests, issues, or tasks through structured forms, email, or API.
-      </p>
-    </div>
-
-    <div className="step">
-      <div className="num">2</div>
-      <h4>Auto-Route & Prioritize</h4>
-      <p>
-        The system automatically assigns the request to the right team, sets priority, and applies SLA rules.
-      </p>
-    </div>
-
-    <div className="step">
-      <div className="num">3</div>
-      <h4>Track & Collaborate</h4>
-      <p>
-        Teams collaborate, update status, add comments, and track progress in real time.
-      </p>
-    </div>
-
-    <div className="step">
-      <div className="num">4</div>
-      <h4>Deliver & Audit</h4>
-      <p>
-        Once resolved, stakeholders are notified and a complete audit trail is maintained for compliance.
-      </p>
-    </div>
-
-  </div>
-</section>
-
-
+      {/* Footer */}
       <footer className="footer">
         <div className="container footer-inner">
           <div>© 2025 Segmento Resolve</div>
@@ -195,4 +182,3 @@ export default function Landing() {
     </div>
   );
 }
-
