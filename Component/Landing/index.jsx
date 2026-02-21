@@ -52,7 +52,7 @@ export default function Landing() {
                 <span>Active tickets</span>
               </div>
               <div className="stat">
-                <strong>99.9%</strong>
+                <strong>100%</strong>
                 <span>Uptime</span>
               </div>
             </div>
@@ -173,7 +173,7 @@ export default function Landing() {
       {/* Footer */}
       <footer className="footer">
         <div className="container footer-inner">
-          <div>© 2025 Segmento Resolve</div>
+          <div>© 2025 Segmento</div>
           <div>
             <button className="link" onClick={() => navigate("/register")}>Try free</button>
           </div>
