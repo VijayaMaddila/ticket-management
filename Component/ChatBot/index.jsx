@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import "./index.css";
+import { API_BASE_URL } from "../../src/config/api";
 
 const ChatBot = () => {
   const isLoginPage =
@@ -16,22 +17,21 @@ const ChatBot = () => {
   const scrollRef = useRef(null);
   const textareaRef = useRef(null);
 
+  // Scroll to bottom when messages change
   useEffect(() => {
     if (open && scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages, open]);
 
+  // Read user info from localStorage
   useEffect(() => {
     const readUser = () => {
       try {
         const u = localStorage.getItem("user");
-        if (!u) {
-          setUserId(null);
-          return;
-        }
+        if (!u) return setUserId(null);
         const parsed = JSON.parse(u);
-        setUserId(parsed && parsed.id ? parsed.id : null);
+        setUserId(parsed?.id ?? null);
       } catch {
         setUserId(null);
       }
@@ -44,6 +44,7 @@ const ChatBot = () => {
     return () => window.removeEventListener("storage", onStorage);
   }, []);
 
+  // Show welcome message when user logs in
   useEffect(() => {
     if (!userId) {
       setMessages([]);
@@ -54,8 +55,7 @@ const ChatBot = () => {
       const u = localStorage.getItem("user");
       if (u) {
         const parsedUser = JSON.parse(u);
-        userName =
-          parsedUser && parsedUser.name ? parsedUser.name.split(" ")[0] : null;
+        userName = parsedUser?.name?.split(" ")[0] ?? null;
       }
     } catch {
       userName = null;
@@ -68,27 +68,21 @@ const ChatBot = () => {
     setMessages([welcomeMsg]);
   }, [userId]);
 
+  // Send user message to backend
   const sendMessage = async (text) => {
     if (!text) return;
     const trimmed = text.trim();
 
     let displayText = trimmed;
     let payload = trimmed;
+
+    // Handle quick replies
     try {
-      const normalizedKey = trimmed
-        .replace(/^[\s\(]+|[\s\)\.\-\:]+$/g, "")
-        .toLowerCase();
-      const latestBotMsg = [...messages]
-        .slice()
-        .reverse()
-        .find((m) => m.from === "bot");
-      const possibleReplies = extractQuickReplies(
-        latestBotMsg ? latestBotMsg.text : ""
-      );
-      if (possibleReplies && possibleReplies.length > 0) {
-        const match = possibleReplies.find(
-          (q) => String(q.key).toLowerCase() === normalizedKey
-        );
+      const normalizedKey = trimmed.replace(/^[\s\(]+|[\s\)\.\-\:]+$/g, "").toLowerCase();
+      const latestBotMsg = [...messages].reverse().find((m) => m.from === "bot");
+      const possibleReplies = extractQuickReplies(latestBotMsg?.text ?? "");
+      if (possibleReplies?.length) {
+        const match = possibleReplies.find((q) => String(q.key).toLowerCase() === normalizedKey);
         if (match) {
           displayText = `${match.key} — ${match.label}`;
           payload = String(match.key);
@@ -104,34 +98,29 @@ const ChatBot = () => {
       const u = localStorage.getItem("user");
       if (u) {
         const parsed = JSON.parse(u);
-        if (parsed && parsed.id) currentUserId = parsed.id;
+        if (parsed?.id) currentUserId = parsed.id;
       }
     } catch {}
 
     if (!currentUserId) {
       setMessages((m) => [
         ...m,
-        {
-          from: "bot",
-          text: "Please log in to use the chat.",
-          time: new Date().toISOString(),
-        },
+        { from: "bot", text: "Please log in to use the chat.", time: new Date().toISOString() },
       ]);
       return;
     }
 
     const userMsg = { from: "user", text: displayText, time: new Date().toISOString() };
-    const currentMessages = [...messages, userMsg];
-    setMessages(currentMessages);
+    setMessages((m) => [...m, userMsg]);
     setInput("");
     setLoading(true);
 
     try {
       const res = await fetch(`${API_BASE_URL}/api/chat?userId=${currentUserId}`, {
-  method: "POST",
-  headers: { "Content-Type": "text/plain" },
-  body: payload,
-});
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        body: payload,
+      });
 
       if (!res.ok) throw new Error("Network response was not ok");
 
@@ -156,6 +145,7 @@ const ChatBot = () => {
     }
   };
 
+  // Handlers
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -168,8 +158,7 @@ const ChatBot = () => {
     const ta = textareaRef.current;
     if (!ta) return;
     ta.style.height = "auto";
-    const newHeight = Math.min(ta.scrollHeight, 140);
-    ta.style.height = newHeight + "px";
+    ta.style.height = Math.min(ta.scrollHeight, 140) + "px";
   };
 
   const formatTime = (iso) => {
@@ -181,6 +170,7 @@ const ChatBot = () => {
     }
   };
 
+  // Quick replies extraction
   const extractQuickReplies = (text) => {
     if (!text) return [];
     const lines = text.split(/\r?\n/);
@@ -189,40 +179,32 @@ const ChatBot = () => {
       const m = line.trim().match(/^[\-\*\s]*([0-9]+|[A-Za-z])[\.\)\-]\s*(.+)/);
       if (m) opts.push({ key: m[1], label: m[2].trim() });
     }
-    if (opts.length === 0) {
-      const split = text
-        .split(/(?:\r?\n|1\.|2\.|3\.)/)
-        .map((s) => s.trim())
-        .filter(Boolean);
-      if (split.length > 1) {
-        split.forEach((s, i) => opts.push({ key: String(i + 1), label: s }));
-      }
+    if (!opts.length) {
+      const split = text.split(/(?:\r?\n|1\.|2\.|3\.)/).map((s) => s.trim()).filter(Boolean);
+      split.forEach((s, i) => opts.push({ key: String(i + 1), label: s }));
     }
     return opts.slice(0, 5);
   };
 
+  // Prepare quick replies for the latest bot message
   const latestBot = [...messages].reverse().find((m) => m.from === "bot");
-  let quickReplies = extractQuickReplies(latestBot ? latestBot.text : "");
-  // If the bot provided structured ticket details, avoid turning them into quick-reply buttons
+  let quickReplies = extractQuickReplies(latestBot?.text ?? "");
   const structuredDetailsRegex = /(ticket\s*details|title:|status:|priority:|due\s*date:)/i;
   if (latestBot && structuredDetailsRegex.test(latestBot.text)) {
     quickReplies = [];
   } else {
-    // keep only concise single-line quick replies to avoid large duplicate blocks
     quickReplies = quickReplies.filter(
       (q) => typeof q.label === "string" && q.label.length <= 60 && !q.label.includes("\n")
     );
   }
 
+  // Render
   return (
     <>
       <button
         className="chatbot-button"
         aria-label="Open chat"
-        onClick={() => {
-          setOpen((v) => !v);
-          setMinimized(false);
-        }}
+        onClick={() => { setOpen((v) => !v); setMinimized(false); }}
       >
         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" aria-hidden>
           <path d="M21 6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3v3l4-3h6a2 2 0 0 0 2-2V6z" fill="#fff"/>
@@ -237,28 +219,13 @@ const ChatBot = () => {
               <div className="chat-subtitle">How can I help you today?</div>
             </div>
             <div className="chat-actions">
-              <button
-                className="chat-minimize"
-                onClick={() => setMinimized((v) => !v)}
-                aria-label="Minimize"
-              >
-                —
-              </button>
-              <button
-                className="chat-close"
-                onClick={() => setOpen(false)}
-                aria-label="Close"
-              >
-                ✕
-              </button>
+              <button className="chat-minimize" onClick={() => setMinimized((v) => !v)} aria-label="Minimize">—</button>
+              <button className="chat-close" onClick={() => setOpen(false)} aria-label="Close">✕</button>
             </div>
           </div>
 
           {minimized ? (
-            <div
-              className="chat-minimized"
-              onClick={() => setMinimized(false)}
-            >
+            <div className="chat-minimized" onClick={() => setMinimized(false)}>
               Click to expand chat
             </div>
           ) : (
@@ -296,7 +263,6 @@ const ChatBot = () => {
                           </svg>
                         </div>
                         <div className="bot-content">
-                          {/* Render each line of bot message separately */}
                           {m.text.split("\n").map((line, idx) => (
                             <div key={idx} className="bot-text">{line}</div>
                           ))}
@@ -329,15 +295,10 @@ const ChatBot = () => {
                   </div>
                 )}
 
-                {/* Quick replies */}
-                {quickReplies && quickReplies.length > 0 && (
+                {quickReplies?.length > 0 && (
                   <div className="quick-replies">
                     {quickReplies.map((q) => (
-                      <button
-                        key={q.key}
-                        className="quick-reply"
-                        onClick={() => sendMessage(q.key)}
-                      >
+                      <button key={q.key} className="quick-reply" onClick={() => sendMessage(q.key)}>
                         {q.label}
                       </button>
                     ))}
